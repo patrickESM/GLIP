@@ -42,7 +42,8 @@ class GLIPDemo(object):
         self.min_image_size = min_image_size
         self.show_mask_heatmaps = show_mask_heatmaps
         self.masks_per_dim = masks_per_dim
-
+        self.color = 255
+        
         save_dir = cfg.OUTPUT_DIR
         if load_model:
             checkpointer = DetectronCheckpointer(cfg, self.model, save_dir=save_dir)
