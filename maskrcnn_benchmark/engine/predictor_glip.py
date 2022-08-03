@@ -149,6 +149,24 @@ class GLIPDemo(object):
         if self.cfg.MODEL.MASK_ON:
             result = self.overlay_mask(result, top_predictions)
         return result, top_predictions
+    
+    def detect_on_image(self,
+            original_image,
+            original_caption,
+            thresh=0.5,
+            custom_entity = None,
+            alpha = 0.0):
+        predictions = self.compute_prediction(original_image, original_caption, custom_entity)
+        top_predictions = self._post_process(predictions, thresh)
+
+        # result = original_image.copy()
+        # if self.show_mask_heatmaps:
+        #     return self.create_mask_montage(result, top_predictions)
+        # result = self.overlay_boxes(result, top_predictions)
+        # result = self.overlay_entity_names(result, top_predictions)
+        # if self.cfg.MODEL.MASK_ON:
+        #     result = self.overlay_mask(result, top_predictions)
+        return top_predictions
 
     def visualize_with_predictions(self, 
             original_image, 
