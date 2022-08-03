@@ -16,7 +16,7 @@ import argparse
 from microservicemqtt import microserviceclient
 from microservicemqtt import microservice
 import time
-
+import json
 
 def main(config_file, weight_file, service_name, caption):
 
