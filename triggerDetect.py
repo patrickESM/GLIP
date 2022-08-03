@@ -33,41 +33,57 @@ def main(config_file, weight_file, service_name, caption):
         show_mask_heatmaps=False
     )
 
+    def do_detection(payload):
+        colorFrame = cv2.imdecode(np.asarray(bytearray(payload), dtype=np.uint8), cv2.IMREAD_COLOR)
+        splitted_caption = caption.split(".")
+        image = np.array(colorFrame)[:, :, [2, 1, 0]]
+
+        # top_predications = do_detetcion(image, splitted_caption)
+
+        # do inference with colorFrame
+        top_predictions = glip_demo.detect_on_image(image, caption, 0.5)
+        # result = cv2.cvtColor(result[:, :, [2, 1, 0]], cv2.COLOR_RGB2BGR)
+        # print(top_predictions)
+
+        labels = top_predictions.get_field("labels").numpy()
+        boxes = top_predictions.bbox.numpy()
+        print(labels)
+        print(boxes)
+
+        json_inference_results = []
+        for label_idx, label in enumerate(labels):
+            tmp_result = {}
+            tmp_result["class_id"] = int(label)
+            tmp_result["class_name"] = str(splitted_caption[label - 1])
+            tmp_result["top_left_xy"] = [float(boxes[label_idx][0]), float(boxes[label_idx][1])]
+            tmp_result["bottom_right_xy"] = [float(boxes[label_idx][2]), float(boxes[label_idx][3])]
+            json_inference_results.append(tmp_result)
+
+        return json_inference_results
+
     def on_binary_notification_handler(methodName, payload):
         if methodName == "triggeredImage":
-            colorFrame = cv2.imdecode(np.asarray(bytearray(payload), dtype=np.uint8), cv2.IMREAD_COLOR)
-            image = np.array(colorFrame)[:, :, [2, 1, 0]]
-
-            # do inference with colorFrame
-            top_predictions = glip_demo.detect_on_image(image, caption, 0.5)
-            # result = cv2.cvtColor(result[:, :, [2, 1, 0]], cv2.COLOR_RGB2BGR)
-            # print(top_predictions)
-            splitted_caption = caption.split(".")
-
-            labels = top_predictions.get_field("labels").numpy()
-            boxes = top_predictions.bbox.numpy()
-            print(labels)
-            print(boxes)
-
-            json_inference_results = []
-            for label_idx, label in enumerate(labels):
-                tmp_result = {}
-                tmp_result["class_id"] = int(label)
-                tmp_result["class_name"] = str(splitted_caption[label-1])
-                tmp_result["top_left_xy"] = [float(boxes[label_idx][0]),  float(boxes[label_idx][1])]
-                tmp_result["bottom_right_xy"] = [float(boxes[label_idx][2]), float(boxes[label_idx][3])]
-                json_inference_results.append(tmp_result)
-            # # loop result back to the server
+            json_inference_results = do_detection(payload)
             client.notify("loop_inferenceResult", json_inference_results)
+
+    def on_detect_callback(payload):
+        json_inference_results = do_detection(payload)
+        return json_inference_results
 
     client = microserviceclient.MicroserviceClient(service_name)
     client.on_binaryNotification = on_binary_notification_handler;
     client.start()
 
+    server = microservice.Microservice("glipDetectorSuparmucac3")
+    server._brokerip = "141.19.87.230"
+    server.registerBinaryMethod("detect", on_detect_callback)
+    server.start()
+
     while True:
         time.sleep(0.10)
 
     client.stop()
+    server.stop()
 
     # base_path = "/mnt/e/data/studyShowcase/input/"
     # out_path = "/mnt/e/data/studyShowcase/output/"
