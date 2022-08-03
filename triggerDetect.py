@@ -68,7 +68,7 @@ def main(config_file, weight_file, service_name, caption):
 
     def on_detect_callback(payload):
         json_inference_results = do_detection(payload)
-        return json_inference_results
+        return json.dumps(json_inference_results, indent=4)
 
     client = microserviceclient.MicroserviceClient(service_name)
     client.on_binaryNotification = on_binary_notification_handler;
