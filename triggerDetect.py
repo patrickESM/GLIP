@@ -116,8 +116,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--caption",
         default="person . car",
-        help="caption to detect ",
-        required=True
+        help="caption to detect "
     )
     parser.add_argument('--service_name', required=True, help='Name of the image source)')
 
