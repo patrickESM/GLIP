@@ -69,6 +69,11 @@ def main(config_file, weight_file, service_name, caption):
     def on_detect_callback(payload):
         json_inference_results = do_detection(payload)
         return json.dumps(json_inference_results, indent=4)
+    
+    def on_setCaption_callback(payload):
+        print payload
+        caption = payload
+        return None
 
     client = microserviceclient.MicroserviceClient(service_name)
     client.on_binaryNotification = on_binary_notification_handler;
@@ -77,6 +82,7 @@ def main(config_file, weight_file, service_name, caption):
     server = microservice.Microservice("glipDetectorSuparmucac3")
     server._brokerip = "141.19.87.230"
     server.registerBinaryMethod("detect", on_detect_callback)
+    server.registerMethod("setCaption", on_setCaption_callback)
     server.start()
 
     while True:
@@ -125,8 +131,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--caption",
         default="person . car",
-        help="caption to detect ",
-        required=True
+        help="caption to detect "
     )
     parser.add_argument('--service_name', required=True, help='Name of the image source)')
 
