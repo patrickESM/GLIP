@@ -1,3 +1,5 @@
+import json
+
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 
@@ -16,7 +18,7 @@ import argparse
 from microservicemqtt import microserviceclient
 from microservicemqtt import microservice
 import time
-import json
+
 
 def main(config_file, weight_file, service_name, caption):
 
@@ -25,7 +27,7 @@ def main(config_file, weight_file, service_name, caption):
     cfg.merge_from_file(config_file)
     cfg.merge_from_list(["MODEL.WEIGHT", weight_file])
     cfg.merge_from_list(["MODEL.DEVICE", "cuda"])
-
+    print("before GLIPDemo")
     glip_demo = GLIPDemo(
         cfg,
         min_image_size=896,
@@ -67,11 +69,13 @@ def main(config_file, weight_file, service_name, caption):
             client.notify("loop_inferenceResult", json_inference_results)
 
     def on_detect_callback(payload):
+        print("received detect call")
         json_inference_results = do_detection(payload)
         return json.dumps(json_inference_results, indent=4)
-    
+
     def on_setCaption_callback(payload):
-        print payload
+        print(payload)
+        nonlocal caption
         caption = payload
         return None
 
@@ -90,25 +94,6 @@ def main(config_file, weight_file, service_name, caption):
 
     client.stop()
     server.stop()
-
-    # base_path = "/mnt/e/data/studyShowcase/input/"
-    # out_path = "/mnt/e/data/studyShowcase/output/"
-    # image_filenames = sorted(os.listdir(base_path))
-    #
-    # for image_name in image_filenames:
-    #     # image_name = image_filenames[0]
-    #     image_path = os.path.join(base_path, image_name)
-    #
-    #     pil_image = Image.open(image_path).convert("RGB")
-    #     # convert to BGR format
-    #     image = np.array(pil_image)[:, :, [2, 1, 0]]
-    #     caption = 'person . shirt, which is blue . pants, which is blue . gown, which is long and blue . hat . glove . mask . garbage bag, which is blue . bowl, which is small and blue . white tray . monitor. green scissor . object'
-    #
-    #     result, _ = glip_demo.run_on_web_image(image, caption, 0.5)
-    #     result = cv2.cvtColor(result[:, :, [2, 1, 0]], cv2.COLOR_RGB2BGR)
-    #     out_filename = os.path.join(out_path, image_name)
-    #     cv2.imwrite(out_filename, result)
-    #     # cv2.imshow("results", result[:, :, [2, 1, 0]])
 
     return 0
 
@@ -131,7 +116,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--caption",
         default="person . car",
-        help="caption to detect "
+        help="caption to detect ",
+        required=True
     )
     parser.add_argument('--service_name', required=True, help='Name of the image source)')
 
