@@ -20,7 +20,7 @@ from microservicemqtt import microservice
 import time
 
 
-def main(config_file, weight_file, service_name, caption):
+def main(config_file, weight_file, service_name, caption, image_service_name):
 
     cfg.local_rank = 0
     cfg.num_gpus = 1
@@ -79,11 +79,11 @@ def main(config_file, weight_file, service_name, caption):
         caption = payload
         return None
 
-    client = microserviceclient.MicroserviceClient(service_name)
+    client = microserviceclient.MicroserviceClient(image_service_name)
     client.on_binaryNotification = on_binary_notification_handler;
     client.start()
 
-    server = microservice.Microservice("glipDetectorSuparmucac3")
+    server = microservice.Microservice(service_name)
     server._brokerip = "141.19.87.230"
     server.registerBinaryMethod("detect", on_detect_callback)
     server.registerMethod("setCaption", on_setCaption_callback)
@@ -118,6 +118,7 @@ if __name__ == "__main__":
         default="person . car",
         help="caption to detect "
     )
+    parser.add_argument('--image_service_name', required=True, help='Name of the image source)')
     parser.add_argument('--service_name', required=True, help='Name of the image source)')
 
     args = parser.parse_args()
@@ -126,10 +127,11 @@ if __name__ == "__main__":
     # weight_file = "MODEL/glip_tiny_model_o365_goldg_cc_sbu.pth"
     config_file = args.config_file
     weight_file = args.weight_file
+    image_service_name = args.image_service_name
     service_name = args.service_name
     caption = args.caption
 
     os.environ["BROKER_IP"] = "141.19.87.230"
-    ret = main(config_file, weight_file, service_name, caption)
+    ret = main(config_file, weight_file, service_name, caption, image_service_name)
 
     print("main return with: " + str(ret))
