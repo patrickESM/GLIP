@@ -1,3 +1,11 @@
+# EDIT from fork:
+
+- added triggerDetect.py for remote detection with Microservice pypi package
+
+- new requirements pypi: paho-mqtt, microservicemqtt
+
+- use detect remote call for direct client to server inference with sent back results. the other path is for internal usage and i won't document here
+
 # GLIP: Grounded Language-Image Pre-training  
 
 <img src="docs/lead.png" width="800"> 
