@@ -103,6 +103,7 @@ if __name__ == "__main__":
         "--config-file",
         default="configs/pretrain/glip_Swin_T_O365_GoldG.yaml",
         metavar="FILE",
+        required=True,
         help="path to config file",
         type=str,
     )
