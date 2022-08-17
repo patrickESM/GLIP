@@ -6,6 +6,8 @@
 
 - use detect remote call for direct client to server inference with sent back results. the other path is for internal usage and i won't document here
 
+- setCaption remote call sets the caption for GLIP to detect. expected string sperated with '.' (exp: "person . car . bus")
+
 # GLIP: Grounded Language-Image Pre-training  
 
 <img src="docs/lead.png" width="800"> 
