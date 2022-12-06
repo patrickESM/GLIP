@@ -145,7 +145,7 @@ class GLIPDemo(object):
         if self.show_mask_heatmaps:
             return self.create_mask_montage(result, top_predictions)
         result = self.overlay_boxes(result, top_predictions)
-        result = self.overlay_entity_names(result, top_predictions)
+        result = self.overlay_entity_names(result, top_predictions, original_caption)
         if self.cfg.MODEL.MASK_ON:
             result = self.overlay_mask(result, top_predictions)
         return result, top_predictions
@@ -333,24 +333,26 @@ class GLIPDemo(object):
 
         return image
 
-    def overlay_entity_names(self, image, predictions, names=None, text_size=1.0, text_pixel=2, text_offset = 10, text_offset_original = 4):
+    def overlay_entity_names(self, image, predictions, original_caption, names=None, text_size=1.0, text_pixel=2, text_offset = 10, text_offset_original = 4):
         scores = predictions.get_field("scores").tolist()
         labels = predictions.get_field("labels").tolist()
         new_labels = []
-        if self.cfg.MODEL.RPN_ARCHITECTURE == "VLDYHEAD":
-            plus = 1
-        else:
-            plus = 0
-        self.plus = plus
-        if self.entities and self.plus:
-            for i in labels:
-                if i <= len(self.entities):
-                    new_labels.append(self.entities[i - self.plus])
-                else:
-                    new_labels.append('object')
-            # labels = [self.entities[i - self.plus] for i in labels ]
-        else:
-            new_labels = ['object' for i in labels]
+        for i in labels:
+            new_labels.append(original_caption[i-1])
+#         if self.cfg.MODEL.RPN_ARCHITECTURE == "VLDYHEAD":
+#             plus = 1
+#         else:
+#             plus = 0
+#         self.plus = plus
+#         if self.entities and self.plus:
+#             for i in labels:
+#                 if i <= len(self.entities):
+#                     new_labels.append(self.entities[i - self.plus])
+#                 else:
+#                     new_labels.append('object')
+#             # labels = [self.entities[i - self.plus] for i in labels ]
+#         else:
+#             new_labels = ['object' for i in labels]
         boxes = predictions.bbox
 
         template = "{}:{:.2f}"
