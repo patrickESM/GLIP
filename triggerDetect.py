@@ -77,7 +77,7 @@ def main(config_file, weight_file, service_name, caption, image_service_name):
         print(payload)
         nonlocal caption
         splitted_caption = payload.split(".")
-        print("new_caption_string: " + splitted_caption)
+        #print("new_caption_string: " + splitted_caption)
         caption = splitted_caption
         return None
 
