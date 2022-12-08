@@ -76,7 +76,9 @@ def main(config_file, weight_file, service_name, caption, image_service_name):
     def on_setCaption_callback(payload):
         print(payload)
         nonlocal caption
-        caption = payload
+        splitted_caption = payload.split(".")
+        print("new_caption_string: " + splitted_caption)
+        caption = splitted_caption
         return None
 
     client = microserviceclient.MicroserviceClient(image_service_name)
